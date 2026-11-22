@@ -1,24 +1,28 @@
 
+"""Excepciones específicas del sistema Software FJ."""
+
+
 class ErrorSistema(Exception):
-    """Excepción general de Software FJ."""
+    """Error general del sistema."""
     pass
 
 
 class ClienteInvalidoError(ErrorSistema):
-    """Error relacionado con datos de clientes."""
+    """Error por información incorrecta de un cliente."""
     pass
 
 
 class ServicioNoDisponibleError(ErrorSistema):
-    """Error relacionado con servicios."""
+    """Error de disponibilidad o parámetros de servicios."""
     pass
 
 
 class ReservaInvalidaError(ErrorSistema):
-    """Error relacionado con las reservas."""
+    """Error por una reserva u operación no permitida."""
     pass
 
 
 class CalculoInvalidoError(ErrorSistema):
-    """Error relacionado con cálculos."""
+    """Error por parámetros incorrectos en cálculos."""
     pass
+

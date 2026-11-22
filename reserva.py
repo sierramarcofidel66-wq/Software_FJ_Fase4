@@ -1,22 +1,36 @@
 
+"""Gestión de reservas de Software FJ."""
+
 from cliente import Cliente
 from servicios import Servicio
+from excepciones import ReservaInvalidaError
 
 
 class Reserva:
-    """Gestiona las reservas de clientes y servicios."""
+    """Relaciona cliente, servicio, duración y estado."""
 
     contador = 0
 
     def __init__(self, cliente, servicio, duracion):
         if not isinstance(cliente, Cliente):
-            raise TypeError("El cliente no es válido.")
+            raise ReservaInvalidaError(
+                "El cliente no es válido."
+            )
 
         if not isinstance(servicio, Servicio):
-            raise TypeError("El servicio no es válido.")
+            raise ReservaInvalidaError(
+                "El servicio no es válido."
+            )
 
-        servicio.validar_duracion(duracion)
-        servicio.validar_parametros()
+        try:
+            servicio.validar_duracion(duracion)
+            servicio.validar_parametros()
+            servicio.validar_disponibilidad()
+
+        except Exception as error:
+            raise ReservaInvalidaError(
+                "Los parámetros de la reserva no son válidos."
+            ) from error
 
         Reserva.contador += 1
 
@@ -31,8 +45,9 @@ class Reserva:
         return self.__estado
 
     def confirmar(self):
+        """Confirma únicamente reservas pendientes."""
         if self.__estado != "Pendiente":
-            raise ValueError(
+            raise ReservaInvalidaError(
                 "Solo se pueden confirmar reservas pendientes."
             )
 
@@ -40,11 +55,14 @@ class Reserva:
         return "Reserva confirmada correctamente."
 
     def cancelar(self):
+        """Cancela reservas que aún lo permitan."""
         if self.__estado == "Cancelada":
-            raise ValueError("La reserva ya está cancelada.")
+            raise ReservaInvalidaError(
+                "La reserva ya está cancelada."
+            )
 
         if self.__estado == "Procesada":
-            raise ValueError(
+            raise ReservaInvalidaError(
                 "No se puede cancelar una reserva procesada."
             )
 
@@ -52,8 +70,9 @@ class Reserva:
         return "Reserva cancelada correctamente."
 
     def procesar(self):
+        """Calcula y procesa una reserva confirmada."""
         if self.__estado != "Confirmada":
-            raise ValueError(
+            raise ReservaInvalidaError(
                 "La reserva debe estar confirmada para procesarse."
             )
 
@@ -65,10 +84,12 @@ class Reserva:
         return total
 
     def mostrar_reserva(self):
+        """Devuelve la información de la reserva."""
         return (
-            f"\nCódigo: {self.__codigo}"
-            f"\nCliente: {self.__cliente.nombre}"
-            f"\nServicio: {self.__servicio.describir_servicio()}"
-            f"\nDuración: {self.__duracion} horas"
-            f"\nEstado: {self.__estado}"
+            f"Código: {self.__codigo}\n"
+            f"Cliente: {self.__cliente.nombre}\n"
+            f"Servicio: "
+            f"{self.__servicio.describir_servicio()}\n"
+            f"Duración: {self.__duracion} horas\n"
+            f"Estado: {self.__estado}"
         )
